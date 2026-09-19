@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>thinking-orbs / vanilla — demo</title>
+    <style>
+      :root {
+        --bg: #111318;
+        --fg: #e8eaed;
+        --muted: #9aa1ad;
+        --line: #262b33;
+        --panel: #171a20;
+        --accent: #b7c2ff;
+      }
+      [data-theme='light'] {
+        --bg: #f5f6f8;
+        --fg: #1b1e23;
+        --muted: #626a76;
+        --line: #dde1e7;
+        --panel: #ffffff;
+        --accent: #3949c7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+        padding: 2rem 1.25rem 4rem;
+        transition: background 0.2s, color 0.2s;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.25rem;
+      }
+      h1 small {
+        font-weight: 400;
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin-left: 0.6rem;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      .toolbar {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      button,
+      select {
+        font: inherit;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--fg);
+        cursor: pointer;
+      }
+      button:hover,
+      select:hover {
+        border-color: var(--accent);
+      }
+      button[aria-pressed='true'] {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+        gap: 0.7rem;
+        margin-bottom: 2.5rem;
+      }
+      .cell {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+      }
+      .cell .name {
+        font-size: 0.8rem;
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .cell .sizes {
+        display: flex;
+        gap: 1.1rem;
+        align-items: flex-end;
+      }
+      .cell .size-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+      .cell canvas {
+        outline: 1px dotted transparent;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 1.1rem 1.25rem;
+        margin-bottom: 1.6rem;
+      }
+      .panel h2 {
+        font-size: 1rem;
+        margin: 0 0 1rem;
+      }
+      .sandbox {
+        display: flex;
+        gap: 1.6rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .sandbox .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        flex: 1 1 260px;
+        min-width: 240px;
+      }
+      .sandbox .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 150px;
+        padding: 0.9rem;
+        background: var(--bg);
+        border: 1px dashed var(--line);
+        border-radius: 10px;
+      }
+      .sandbox .stage .meta {
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+      }
+      .row label {
+        min-width: 58px;
+        color: var(--muted);
+      }
+      .row input[type='range'] {
+        flex: 1;
+        accent-color: var(--accent);
+      }
+      .row .val {
+        min-width: 42px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        color: var(--muted);
+      }
+      .interp {
+        display: flex;
+        gap: 1.4rem;
+        align-items: flex-end;
+        flex-wrap: wrap;
+      }
+      .interp .col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--muted);
+        font-size: 0.7rem;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.78rem;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 0.05rem 0.35rem;
+      }
+      .usage pre {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        margin: 0 0 1rem;
+      }
+      .usage p {
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>thinking-orbs <small>vanilla port — single file, zero dependencies</small></h1>
+    <p class="sub">
+      Nine hand-tuned animated loading indicators. <code>&lt;canvas data-thinking-orb&gt;</code> starts
+      automatically; everything below was created by the attributes alone.
+    </p>
+
+    <div class="toolbar">
+      <button id="themeBtn" type="button">Theme: dark</button>
+      <span class="sub" style="margin: 0">auto-detects <code>data-theme</code> / <code>.dark</code> / OS preference</span>
+    </div>
+
+    <div class="grid">
+      <div class="cell">
+        <div class="name">working</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="working" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="working" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">searching</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="searching" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="searching" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">solving</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="solving" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="solving" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">listening</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="listening" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="listening" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">connecting</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="connecting" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="connecting" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">weaving</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="weaving" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="weaving" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">composing</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="composing" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="composing" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">breathing</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="breathing" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="breathing" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+
+      <div class="cell">
+        <div class="name">shaping</div>
+        <div class="sizes">
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="shaping" data-size="64"></canvas>
+            64
+          </div>
+          <div class="size-label">
+            <canvas data-thinking-orb data-state="shaping" data-size="20"></canvas>
+            20
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Sandbox — programmatic API with arbitrary sizes</h2>
+      <div class="sandbox">
+        <div class="stage">
+          <div id="stageRoot"></div>
+          <div class="meta" id="stageMeta">composing · 64px</div>
+        </div>
+        <div class="controls">
+          <div class="row">
+            <label for="stateSel">state</label>
+            <select id="stateSel">
+              <option>working</option>
+              <option>searching</option>
+              <option>solving</option>
+              <option>listening</option>
+              <option>connecting</option>
+              <option>weaving</option>
+              <option selected>composing</option>
+              <option>breathing</option>
+              <option>shaping</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="sizeRange">size</label>
+            <input id="sizeRange" type="range" min="8" max="128" step="1" value="64" />
+            <span class="val" id="sizeVal">64</span>
+          </div>
+          <div class="row">
+            <label for="speedRange">speed</label>
+            <input id="speedRange" type="range" min="0.25" max="3" step="0.05" value="1" />
+            <span class="val" id="speedVal">1.00</span>
+          </div>
+          <div class="row">
+            <label>theme</label>
+            <div style="display: flex; gap: 0.4rem">
+              <button id="themeAuto" type="button" aria-pressed="true">auto</button>
+              <button id="themeDark" type="button">dark</button>
+              <button id="themeLight" type="button">light</button>
+            </div>
+          </div>
+          <div class="row">
+            <label>pause</label>
+            <button id="pauseBtn" type="button" aria-pressed="false">pause</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Out-of-the-box sizes (interpolation between the 64 / 20 presets)</h2>
+      <div class="interp">
+        <div class="col">
+          <canvas id="interp12"></canvas>
+          12
+        </div>
+        <div class="col">
+          <canvas id="interp40"></canvas>
+          40
+        </div>
+        <div class="col">
+          <canvas id="interp90"></canvas>
+          90
+        </div>
+      </div>
+    </div>
+
+    <div class="panel usage">
+      <h2>Usage</h2>
+      <p>
+        Drop one file in, mark a canvas, done — it starts itself once the DOM is ready:
+      </p>
+      <pre>&lt;canvas data-thinking-orb data-state="searching" data-size="20"&gt;&lt;/canvas&gt;
+&lt;script src="thinking-orbs.js"&gt;&lt;/script&gt;</pre>
+      <p>Or drive it from JavaScript (a container element works too — a canvas is created inside it):</p>
+      <pre>const orb = ThinkingOrbs.create(document.getElementById('stage'), {
+  state: 'composing',
+  size: 64,        // tuned presets are 64 and 20; any size is interpolated
+  theme: 'auto',   // 'auto' | 'dark' | 'light'
+  speed: 1,
+  paused: false,
+  label: 'Composing…' // optional aria-label override
+});
+orb.setState('searching').setSize(48).setTheme('dark').setSpeed(1.5);
+orb.setPaused(true);
+orb.destroy();</pre>
+      <p>
+        Attributes: <code>data-state</code>, <code>data-size</code>, <code>data-theme</code>,
+        <code>data-speed</code>, <code>data-paused</code> ("true"), <code>data-label</code>.
+        Behaviour mirrors the original: shared clock across instances, DPR cap 2, auto-pause
+        offscreen / hidden tab, <code>prefers-reduced-motion</code> → static frame,
+        <code>role="img"</code> + per-state label. Geometry is verified numerically against
+        the original golden spec — run <code>node verify.js</code>.
+      </p>
+    </div>
+
+    <script src="thinking-orbs.js"></script>
+    <script>
+      // theme toggle (auto-init orbs follow it live via the MutationObserver)
+      var themeBtn = document.getElementById('themeBtn');
+      function setRootTheme(mode) {
+        document.documentElement.setAttribute('data-theme', mode);
+        themeBtn.textContent = 'Theme: ' + mode;
+        themeBtn.setAttribute('aria-pressed', String(mode === 'dark'));
+      }
+      setRootTheme('dark');
+      themeBtn.addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme');
+        setRootTheme(cur === 'dark' ? 'light' : 'dark');
+      });
+
+      // sandbox
+      var orb = ThinkingOrbs.create(document.getElementById('stageRoot'), {
+        state: 'composing',
+        size: 64,
+        theme: 'auto',
+        speed: 1
+      });
+      var meta = document.getElementById('stageMeta');
+      var stateSel = document.getElementById('stateSel');
+      var sizeRange = document.getElementById('sizeRange');
+      var sizeVal = document.getElementById('sizeVal');
+      var speedRange = document.getElementById('speedRange');
+      var speedVal = document.getElementById('speedVal');
+      var pauseBtn = document.getElementById('pauseBtn');
+
+      function refreshMeta() {
+        meta.textContent = orb.state + ' · ' + orb.size + 'px · ×' + orb.speedMul.toFixed(2);
+      }
+      stateSel.addEventListener('change', function () {
+        orb.setState(stateSel.value);
+        refreshMeta();
+      });
+      sizeRange.addEventListener('input', function () {
+        sizeVal.textContent = sizeRange.value;
+        orb.setSize(Number(sizeRange.value));
+        refreshMeta();
+      });
+      speedRange.addEventListener('input', function () {
+        speedVal.textContent = Number(speedRange.value).toFixed(2);
+        orb.setSpeed(Number(speedRange.value));
+        refreshMeta();
+      });
+      pauseBtn.addEventListener('click', function () {
+        orb.setPaused(!orb.pausedFlag);
+        pauseBtn.textContent = orb.pausedFlag ? 'resume' : 'pause';
+        pauseBtn.setAttribute('aria-pressed', String(orb.pausedFlag));
+      });
+      document.getElementById('themeAuto').addEventListener('click', function () {
+        orb.setTheme('auto');
+      });
+      document.getElementById('themeDark').addEventListener('click', function () {
+        orb.setTheme('dark');
+      });
+      document.getElementById('themeLight').addEventListener('click', function () {
+        orb.setTheme('light');
+      });
+      refreshMeta();
+
+      // arbitrary-size row
+      ThinkingOrbs.create(document.getElementById('interp12'), { state: 'searching', size: 12 });
+      ThinkingOrbs.create(document.getElementById('interp40'), { state: 'searching', size: 40 });
+      ThinkingOrbs.create(document.getElementById('interp90'), { state: 'searching', size: 90 });
+    </script>
+  </body>
+</html>
