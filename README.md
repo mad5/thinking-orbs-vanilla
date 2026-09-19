@@ -18,6 +18,10 @@ original repo (72 cases).
 Thank you to [Jakub Antalik](https://github.com/Jakubantalik) and the original [thinking-orbs](https://github.com/Jakubantalik/thinking-orbs) project, from which this vanilla port is derived. The animations, states, and visual language originate there; this repository is a dependency-free reimplementation for plain HTML/JS.
 
 
+## Demo
+
+Live example: [https://mad5.de/thinking-orbs-vanilla/](https://mad5.de/thinking-orbs-vanilla/)
+
 ## Include
 
 ```html
